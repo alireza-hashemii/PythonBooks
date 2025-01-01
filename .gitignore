@@ -1,2 +1,7 @@
 .docx
 *.docx
+venv
+.venv
+libs-venv
+env
+*.env
