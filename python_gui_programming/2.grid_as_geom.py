@@ -28,6 +28,8 @@ Checkbutton(window, text='Wrap around').grid(row =4, column=1,sticky='w')
 Radiobutton(window, text='Up', value=1).grid(row=3, column=6,sticky='w')
 Radiobutton(window, text='Down', value=2).grid(row=3, column=7, sticky='e')
 
+
+
 window.mainloop()
 
 

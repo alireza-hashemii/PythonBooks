@@ -1,0 +1,6 @@
+font: Arial 10
+*Label*font: Times 19 bold
+*background: AntiqueWhite1
+*Text*background:rgb(32, 197, 150)
+*Button*foreground:gray55
+*Button*relief: raised
