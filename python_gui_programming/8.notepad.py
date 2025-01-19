@@ -1,5 +1,6 @@
 from tkinter import *
-
+from tkinter import filedialog
+import os
 # accelerator - compound - underline
 
 # Basic configuration of window
@@ -29,6 +30,23 @@ def redo():
 def redo():
     textPad.event_generate("<<SelectAll>>")
 
+
+def open_file():
+    filename = filedialog.askopenfilename(
+        defaultextension='.txt',
+        filetypes =[("All Files","*.*"),("Text Documents","*.txt")]
+        )
+    if filename == '':
+        filename = None
+    else: 
+        window.title(os.path.basename(filename) + 'PYpad')
+        textPad.delete(1.0, END)
+        file_content = open(filename,'r')
+        textPad.insert(1.0,file_content.read())
+        file_content.close()
+
+
+
 def on_find():
     global t2
     t2 = Toplevel(window)
@@ -40,14 +58,64 @@ def on_find():
     v=StringVar()
     e = Entry(t2, width=25, textvariable=v)
     e.grid(row=0, column=1, padx=2, pady=2, sticky='we')
+
     e.focus_set()
     c=IntVar()
-    Checkbutton(t2, text='Ignore Case', variable=c).grid(row=1,
-    column=1, sticky='e', padx=2, pady=2)
-    Button(t2, text="Find All", underline=0, command=lambda:
-    search_for(v.get(), c.get(), textPad, t2, e)).grid(row=0,
-    column=2, sticky='e'+'w', padx=2, pady=2)
-    
+
+    Checkbutton(t2, text='Ignore Case', variable=c).grid(row=1,column=1, sticky='e', padx=2, pady=2)
+    Button(t2, text="Find All", underline=0, command=lambda: search_for(v.get(), c.get(), textPad, t2, e)).grid(row=0,column=2, sticky='e'+'w', padx=2, pady=2)
+
+
+def new_file():
+    window.title("Untitled")
+    global filename
+    filename = None
+    textPad.delete(1.0,END)
+
+
+def save():
+    global filename
+    try:
+        fh = open(filename, 'w')
+        pad_text = textPad.get(1.0,END)
+        fh.write(pad_text)
+        fh.close()
+    except:
+        save_as()
+
+
+def save_as():
+    try:
+        f = filedialog.asksaveasfilename(
+            initialfile='Untitled.txt',
+            defaultextension='.txt',
+            filetypes=[("All Types", "*.*"), ('Text Files', "*.txt")]
+            )
+        
+        newly_created_file = open(f, 'w')
+        contents = textPad.get(1.0, END)
+        newly_created_file.insert(contents)
+        newly_created_file.close()
+        window.title(os.path.basename(f) + ' - pypad')
+
+    except:
+        pass
+
+
+from tkinter import messagebox
+
+def about(event=None):
+    messagebox.showinfo("About","""Tkinter GUI Application\n Development Hotshot""")
+
+
+def help_box(event=None):
+    messagebox.showinfo("Help","For help refer to book:\n Tkinter GUI Application\n Development Hotshot ", icon='question')
+
+def exit_editor(event=None):
+    if messagebox.askokcancel("Quit", "Do you really want to quit?"):
+        window.destroy()
+        
+
 
 def search_for(needle, cssnstv, textPad, t2, e) :
     textPad.tag_remove('match', '1.0', END)
@@ -81,10 +149,12 @@ menubar = Menu(window)
 # first option and it's child options
 filemenu = Menu(menubar, tearoff=0)
 
-filemenu.add_command(label="Open", )
-filemenu.add_command(label="New",)
+filemenu.add_command(label="Open",command=open_file )
+filemenu.add_command(label="New",command=new_file)
+filemenu.add_command(label="Save",command=save, accelerator='Ctrl+S')
+filemenu.add_command(label="Save As",command=save_as)
 filemenu.add_separator()
-filemenu.add_command(label="Exit", command=window.quit)
+filemenu.add_command(label="Exit", command= exit_editor)
 menubar.add_cascade(label='File', menu=filemenu)
 
 
@@ -129,6 +199,11 @@ lnlabel = Label(window, width=2, bg = 'antique white')
 lnlabel.pack(side=LEFT, anchor='nw', fill=Y)
 
 
+aboutmenu = Menu(menubar, tearoff=0)
+aboutmenu.add_command(label = "About", command= about)
+aboutmenu.add_command(label = "Help", command=help_box)
+
+menubar.add_cascade(menu=aboutmenu, label="About")
 
 # text pad and scroll over it in vertical direction
 textPad = Text(window,background='#e9f7ef',undo=True,font=('Comic Sans MS',12, 'bold'))
